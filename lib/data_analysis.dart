@@ -37,15 +37,14 @@ class _Data_analysis extends State<Data_analysis>{
         setState(() {
           date_list.add(element.id);
         });
-        print(date_list.toString());
       });
     });
   }
 
   @override
   void initState() {
-    super.initState();
     get_dates();
+    super.initState();
   }
 
   @override
@@ -145,25 +144,22 @@ class _Data_analysis extends State<Data_analysis>{
                orders_sha7n_rasel = 0;
                orders_mortg3_goz2 = 0;
                snapshot.docs.forEach((element) {
-                 switch (element.data()['cust_status']) {
+                 switch (element.data()['statuse']) {
                    case 'استلم' :
                      {
                        orders_delivered += 1;
-                       orders_price += double.parse(element.data()['cust_delivery_price']);
-                       delivery_fee += double.parse(element.data()['cust_delivery_fee']) +
-                               double.parse(element.data()['cust_delivery_fee_plus']);
+                       /*orders_price += double.parse(element.data()['delivery_price']);
+                       delivery_fee += double.parse(element.data()['delivery_fee']) + double.parse(element.data()['cust_delivery_fee_plus']);*/
                        break;
                      }
                    case 'مرتجع جزئى' :
                      {
                        orders_mortg3_goz2 += 1;
-                       orders_price += double.parse(element.data()['cust_delivery_price']);
-                       delivery_fee +=
-                           double.parse(element.data()['cust_delivery_fee']) +
-                               double.parse(element.data()['cust_delivery_fee_plus']);
+                       /*orders_price += double.parse(element.data()['cust_delivery_price']);
+                       delivery_fee += double.parse(element.data()['delivery_fee']) + double.parse(element.data()['delivery_fee_plus']);*/
                        break;
                      }
-                   case 'لاغى':
+                   case 'مرتجع':
                      {
                        orders_canceled += 1;
                        break;
@@ -171,8 +167,7 @@ class _Data_analysis extends State<Data_analysis>{
                    case 'شحن على الراسل':
                      {
                        orders_sha7n_rasel += 1;
-                       delivery_fee +=
-                           double.parse(element.data()['cust_delivery_fee']);
+                       //delivery_fee += double.parse(element.data()['delivery_fee']);
                        break;
                      }
                  }
@@ -222,7 +217,7 @@ class _Data_analysis extends State<Data_analysis>{
                   circularStrokeCap: CircularStrokeCap.butt,
                   backgroundColor: Colors.grey.shade100,
                   progressColor: Colors.black,
-                  footer: Text('لاغى',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black),),
+                  footer: Text('مرتجع',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.black),),
                 ),
               ],
             ),
@@ -296,7 +291,7 @@ class _Data_analysis extends State<Data_analysis>{
               ),
             ),*/
 
-            Container(height: 30,),
+           /* Container(height: 30,),
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -330,7 +325,7 @@ class _Data_analysis extends State<Data_analysis>{
             ),
 
             Container(height: 30,),
-
+*/
           ],
         ),
     );

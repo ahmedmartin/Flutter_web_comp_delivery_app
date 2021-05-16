@@ -10,9 +10,11 @@ import 'checkout_delivery.dart';
 import 'classies/money.dart';
 import 'package:firebase_db_web_unofficial/firebasedbwebunofficial.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'current_orders.dart';
 import 'data_analysis.dart';
 import 'delivery_history.dart';
 import 'login.dart';
+import 'orders_history.dart';
 
 
 class Home extends StatefulWidget{
@@ -31,6 +33,7 @@ class _Home extends State<Home>{
   List<money> money_list = [];
   String comp_id = 'comp_id';
   DatabaseRef ref ;
+  CollectionReference coll_ref ;
   get_data()async{
 
     ref= FirebaseDatabaseWeb.instance.reference().child('companies').child(comp_id).child('money');
@@ -118,6 +121,32 @@ class _Home extends State<Home>{
                      child: Text('اضافة مندوب جديد',style: TextStyle(fontSize: 20,color: Colors.black,fontWeight: FontWeight.bold),),
                      onPressed: (){
                          add_delivery();
+                     }),
+                 SizedBox(height: 20,),
+                 FlatButton(
+                     color: Colors.white.withOpacity(0),
+                     child: Text('انشاء رحله جديده',style: TextStyle(fontSize: 20,color: Colors.black,fontWeight: FontWeight.bold),),
+                     onPressed: (){
+                       coll_ref = FirebaseFirestore.instance.collection('companies').doc(comp_id).collection('orders');
+                       coll_ref.where('last_date',isEqualTo: 'yes').get().then((snapshot){
+                           snapshot.docs.forEach((element) {
+                             create_new_travel(element.id);
+                           });
+                       });
+                     }),
+                 SizedBox(height: 20,),
+                 FlatButton(
+                     color: Colors.white.withOpacity(0),
+                     child: Text('متابعه الاوردارات',style: TextStyle(fontSize: 20,color: Colors.black,fontWeight: FontWeight.bold),),
+                     onPressed: (){
+                       Navigator.push(context, MaterialPageRoute(builder: (c)=> Current_orders()));
+                     }),
+                 SizedBox(height: 20,),
+                 FlatButton(
+                     color: Colors.white.withOpacity(0),
+                     child: Text('سجل الاوردارات',style: TextStyle(fontSize: 20,color: Colors.black,fontWeight: FontWeight.bold),),
+                     onPressed: (){
+                       Navigator.push(context, MaterialPageRoute(builder: (c)=> Orders_history()));
                      }),
                  SizedBox(height: 20,),
                  FlatButton(
@@ -488,5 +517,64 @@ class _Home extends State<Home>{
      },
    );
  }
+
+
+  create_new_travel(String date){
+    showDialog(context: context, builder: (context) {
+      String date_selected ;
+      return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+                title: Text('انشاء رحله جديده'),
+                content: Center(
+                  child: Column(
+                    children: [
+                      Text('هل تريد غلق الرحله القديمه ',style: TextStyle(fontSize: 20),),
+                      Text(date,style: TextStyle(fontSize: 20),),
+                      Text('و انشاء رحله جديده ؟',style: TextStyle(fontSize: 20),),
+                      SizedBox(height: 20,),
+                      RaisedButton(
+                        color:  Colors.black ,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: BorderSide(color: Colors.black)
+                        ),
+                        onPressed: () async {
+                          DateTime picked = await showDatePicker(
+                              context: context,
+                              initialDate: new DateTime.now(),
+                              firstDate: new DateTime(2016),
+                              lastDate: new DateTime.now()
+                          );
+                          if(picked != null) setState(() => date_selected = picked.toString().split(' ')[0]);
+                        },
+                        child: Text(date_selected!=null?date_selected:'اختار تاريخ الرحله الجديده',style: TextStyle(color: Colors.white,fontSize: 25),),
+                      ),
+                    ],
+                  ),
+                ),
+              actions: [
+                FlatButton(
+                  color:  Colors.black ,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      side: BorderSide(color: Colors.black)
+                  ),
+                  child: Text('انشاء',style: TextStyle(color: Colors.white,fontSize: 25),),
+                  onPressed: (){
+                    if(date_selected != null) {
+                      coll_ref.doc(date_selected).set({'last_date': 'yes'});
+                      coll_ref.doc(date).update({'last_date': 'no'}).whenComplete(() {
+                        Navigator.pop(context);
+                      });
+                    }
+                  },
+                )
+              ],
+            );
+          });
+    });
+  }
+
 
 }
